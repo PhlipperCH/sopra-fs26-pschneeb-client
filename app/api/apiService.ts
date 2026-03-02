@@ -137,7 +137,7 @@ export class ApiService {
     const url = `${this.baseURL}${endpoint}`;
     const res = await fetch(url, {
       method: "DELETE",
-      headers: this.buildHeaders,
+      headers: this.buildHeaders(),
     });
     return this.processResponse<T>(
       res,

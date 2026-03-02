@@ -13,6 +13,24 @@ export class ApiService {
     };
   }
 
+  private buildHeaders(): HeadersInit {
+    const stored = localStorage.getItem("token");
+    let token;
+    if(stored){
+      try{
+        token = JSON.parse(stored);
+      }
+      catch{
+        token = stored;
+      }
+    }
+
+    return {
+      ...this.defaultHeaders,
+      ...(token ? { Authorization: `Bearer ${token}` }: {}),
+    }
+  }
+
   /**
    * Helper function to check the response, parse JSON,
    * and throw an error if the response is not OK.
@@ -64,7 +82,7 @@ export class ApiService {
     const url = `${this.baseURL}${endpoint}`;
     const res = await fetch(url, {
       method: "GET",
-      headers: this.defaultHeaders,
+      headers: this.buildHeaders(),
     });
     return this.processResponse<T>(
       res,
@@ -82,7 +100,7 @@ export class ApiService {
     const url = `${this.baseURL}${endpoint}`;
     const res = await fetch(url, {
       method: "POST",
-      headers: this.defaultHeaders,
+      headers: this.buildHeaders(),
       body: JSON.stringify(data),
     });
     return this.processResponse<T>(
@@ -101,7 +119,7 @@ export class ApiService {
     const url = `${this.baseURL}${endpoint}`;
     const res = await fetch(url, {
       method: "PUT",
-      headers: this.defaultHeaders,
+      headers: this.buildHeaders(),
       body: JSON.stringify(data),
     });
     return this.processResponse<T>(
@@ -119,7 +137,7 @@ export class ApiService {
     const url = `${this.baseURL}${endpoint}`;
     const res = await fetch(url, {
       method: "DELETE",
-      headers: this.defaultHeaders,
+      headers: this.buildHeaders,
     });
     return this.processResponse<T>(
       res,

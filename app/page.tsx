@@ -1,116 +1,89 @@
 "use client"; // For components that need React hooks and browser APIs, SSR (server side rendering) has to be disabled. Read more here: https://nextjs.org/docs/pages/building-your-application/rendering/server-side-rendering
-import { useRouter } from "next/navigation";
-import Image from "next/image";
-import { Button } from "antd";
-import { BookOutlined, CodeOutlined, GlobalOutlined } from "@ant-design/icons";
-import styles from "@/styles/page.module.css";
 
-export default function Home() {
+import { useRouter } from "next/navigation"; // use NextJS router for navigation
+import { useApi } from "@/hooks/useApi";
+import useLocalStorage from "@/hooks/useLocalStorage";
+import { User } from "@/types/user";
+import { Button, Form, Input, Flex } from "antd";
+// Optionally, you can import a CSS module or file for additional styling:
+// import styles from "@/styles/page.module.css";
+
+interface LoginFormValues {
+  username: string;
+  password: string;
+}
+
+const Login: React.FC = () => {
   const router = useRouter();
-  return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            <code>app/page.tsx</code>{" "}
-            is the landing page for your application, currently being displayed.
-          </li>
-          <li>
-            <code>app/login/page.tsx</code> is the login page for users.
-          </li>
-          <li>
-            <code>app/users/page.tsx</code>{" "}
-            is the dashboard that shows an overview of all users, fetched from
-            the server.
-          </li>
-          <li>
-            <code>app/users/[id]/page.tsx</code>{" "}
-            is a slug page that shows info of a particular user. Since each user
-            has its own id, each user has its own infopage, dynamically with the
-            use of slugs.
-          </li>
-          <li>
-            To test, modify the current page <code>app/page.tsx</code>{" "}
-            and save to see your changes instantly.
-          </li>
-        </ol>
+  const apiService = useApi();
+  const [form] = Form.useForm();
+  // useLocalStorage hook example use
+  // The hook returns an object with the value and two functions
+  // Simply choose what you need from the hook:
+  const {
+    // value: token, // is commented out because we do not need the token value
+    set: setToken, // we need this method to set the value of the token to the one we receive from the POST request to the backend server API
+    // clear: clearToken, // is commented out because we do not need to clear the token when logging in
+  } = useLocalStorage<string>("token", ""); // note that the key we are selecting is "token" and the default value we are setting is an empty string
+  // if you want to pick a different token, i.e "usertoken", the line above would look as follows: } = useLocalStorage<string>("usertoken", "");
 
-        <div className={styles.ctas}>
-          <Button
-            type="primary" // as defined in the ConfigProvider in [layout.tsx](./layout.tsx), all primary antd elements are colored #22426b, with buttons #75bd9d as override
-            color="red" // if a single/specific antd component needs yet a different color, it can be explicitly overridden in the component as shown here
-            variant="solid" // read more about the antd button and its options here: https://ant.design/components/button
-            onClick={() =>
-              globalThis.open(
-                "https://vercel.com/new",
-                "_blank",
-                "noopener,noreferrer",
-              )}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Deploy now
-          </Button>
-          <Button
-            type="default"
-            variant="solid"
-            onClick={() =>
-              globalThis.open(
-                "https://nextjs.org/docs",
-                "_blank",
-                "noopener,noreferrer",
-              )}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </Button>
-          <Button
-            type="primary"
-            variant="solid"
-            onClick={() => router.push("/login")}
-          >
-            Go to login
-          </Button>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <Button
-          type="link"
-          icon={<BookOutlined />}
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+  const handleLogin = async (values: LoginFormValues) => {
+    try {
+      // Call the API service and let it handle JSON serialization and error handling
+      const response = await apiService.post<User>("/users/login", values);
+      // Use the useLocalStorage hook that returned a setter function (setToken in line 41) to store the token if available
+      if (response.token) {
+        setToken(response.token);
+      }
+
+      // Navigate to the user overview
+      router.push("/users");
+    } catch (error) {
+      if (error instanceof Error) {
+        alert(`Something went wrong during the login:\n${error.message}`);
+      } else {
+        console.error("An unknown error occurred during login.");
+      }
+    }
+  };
+
+  return (
+    <div className="login-container">
+      <Form
+        form={form}
+        name="login"
+        size="large"
+        variant="outlined"
+        onFinish={handleLogin}
+        layout="vertical"
+      >
+        <Form.Item
+          name="username"
+          label="Username"
+          rules={[{ required: true, message: "Please input your username!" }]}
         >
-          Learn
-        </Button>
-        <Button
-          type="link"
-          icon={<CodeOutlined />}
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+          <Input placeholder="Enter username" />
+        </Form.Item>
+        <Form.Item
+          name="password"
+          label="Password"
+          rules={[{ required: true, message: "Enter password" }]}
         >
-          Examples
-        </Button>
-        <Button
-          type="link"
-          icon={<GlobalOutlined />}
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Go to nextjs.org →
-        </Button>
-      </footer>
+          <Input.Password/>
+        </Form.Item>
+        <Form.Item style={{marginTop:32}}>
+          <Flex gap="middle">
+            <Button type="primary" htmlType="submit" className="button-login">
+              Login
+            </Button>
+            <Button type="primary" className="button-register" onClick={() => router.push("/register")}>
+              Register an Account
+            </Button>
+          </Flex>
+        </Form.Item>
+      </Form>
     </div>
   );
-}
+};
+
+export default Login;

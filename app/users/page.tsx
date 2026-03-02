@@ -2,6 +2,8 @@
 // clicking on a user in this list will display /app/users/[id]/page.tsx
 "use client"; // For components that need React hooks and browser APIs, SSR (server side rendering) has to be disabled. Read more here: https://nextjs.org/docs/pages/building-your-application/rendering/server-side-rendering
 
+import { ApplicationError } from "@/types/error";
+
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
@@ -29,6 +31,11 @@ const columns: TableProps<User>["columns"] = [
     dataIndex: "id",
     key: "id",
   },
+  {
+    title: "Bio",
+    dataIndex: "bio",
+    key: "bio"
+  }
 ];
 
 const Dashboard: React.FC = () => {
@@ -47,7 +54,7 @@ const Dashboard: React.FC = () => {
   const handleLogout = (): void => {
     // Clear token using the returned function 'clear' from the hook
     clearToken();
-    router.push("/login");
+    router.push("/");
   };
 
   useEffect(() => {
@@ -59,6 +66,12 @@ const Dashboard: React.FC = () => {
         setUsers(users);
         console.log("Fetched users:", users);
       } catch (error) {
+        const err = error as ApplicationError;
+        if (err.status == 401){
+          router.replace("/");
+          alert(`You have to log in first to access users!`)
+          return;
+        }
         if (error instanceof Error) {
           alert(`Something went wrong while fetching users:\n${error.message}`);
         } else {
@@ -76,7 +89,7 @@ const Dashboard: React.FC = () => {
   return (
     <div className="card-container">
       <Card
-        title="Get all users from secure endpoint:"
+        title="Users:"
         loading={!users}
         className="dashboard-container"
       >
@@ -92,7 +105,7 @@ const Dashboard: React.FC = () => {
                 style: { cursor: "pointer" },
               })}
             />
-            <Button onClick={handleLogout} type="primary">
+            <Button onClick={handleLogout} type="primary" className="button-login">
               Logout
             </Button>
           </>

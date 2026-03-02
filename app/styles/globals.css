@@ -1,13 +1,32 @@
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  /* backgrounds */
+  --bg: #272822;
+  --bg-dark: #22231D;
+  --bg-panel: #2F302A;
+  --bg-1: #363731;
+  --bg-2: #3E3F39;
+  --bg-3: #464741;
+  --selection: #49483e;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* text */
+  --fg: #f8f8f2;
+  --fg-bright: #f5f4f1;
+  --comment: #75715e;
+  --muted: #a59f85;
+
+  /* accents */
+  --red: #e36d76;
+  --pink: #f92672;
+  --orange: #fd971f;
+  --yellow: #f4bf75;
+  --green: #a6e22e;
+  --cyan: #66d9ef;
+  --aqua: #a1efe4;
+  --purple: #ae81ff;
+  --blue: #51afef;
+}
+html {
+  color-scheme: dark;
 }
 
 html,
@@ -17,8 +36,8 @@ body {
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
+  background: var(--bg);
+  color: var(--fg);
   font-family: Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -46,11 +65,31 @@ a {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: rgb(41, 44, 59);
+  background-color: var(--bg);
+  flex-direction: column;
+  gap: 32px;
+  grid-row-start: 2;
 }
 
-.login-button {
+.button{
   width: 100%;
+}
+
+.ant-btn.button-login:hover,
+.ant-btn.button-register:hover {
+  border-color: var(--border) !important;
+}
+
+.button-login {
+  background-color: var(--green) !important
+}
+
+.button-register {
+  background-color: var(--red) !important;
+}
+
+.ant-input-password-icon {
+  color: var(--fg) !important;
 }
 
 .card-container {
@@ -58,5 +97,9 @@ a {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: rgb(41, 44, 59);
+  background-color: var(--bg);
+}
+
+.dashboard-container {
+  background-color: var(--bg-dark);
 }

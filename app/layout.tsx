@@ -34,11 +34,11 @@ export default function RootLayout({
               // general theme options are set in token, meaning all primary elements (button, menu, ...) will have this color
               colorPrimary: "#22426b", // selected input field boarder will have this color as well
               borderRadius: 8,
-              colorText: "#fff",
+              colorText: "#f8f8f2",
               fontSize: 16,
 
               // Alias Token
-              colorBgContainer: "#272822",
+              colorBgContainer: "#22231D",
             },
             // if a component type needs special styling, setting here will override default options set in token
             components: {
@@ -53,7 +53,7 @@ export default function RootLayout({
                 algorithm: false, // disable algorithm (line 32)
               },
               Form: {
-                labelColor: "#fff",
+                labelColor: "#f8f8f2",
                 algorithm: theme.darkAlgorithm, // specify a specifc algorithm instead of true/false
               },
               Card: {},

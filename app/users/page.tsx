@@ -32,9 +32,9 @@ const columns: TableProps<User>["columns"] = [
     key: "id",
   },
   {
-    title: "Bio",
-    dataIndex: "bio",
-    key: "bio"
+    title: "Status",
+    dataIndex: "status",
+    key: "status"
   }
 ];
 
@@ -51,10 +51,14 @@ const Dashboard: React.FC = () => {
     clear: clearToken, // all we need in this scenario is a method to clear the token
   } = useLocalStorage<string>("token", ""); // if you wanted to select a different token, i.e "lobby", useLocalStorage<string>("lobby", "");
 
-  const handleLogout = (): void => {
-    // Clear token using the returned function 'clear' from the hook
-    clearToken();
-    router.push("/");
+  const handleLogout = async () => {
+    try {
+      await apiService.post<void>("/users/logout", {});
+    } finally {
+      // Clear token using the returned function 'clear' from the hook
+      clearToken();
+      router.push("/");
+    }
   };
 
   useEffect(() => {
@@ -89,7 +93,7 @@ const Dashboard: React.FC = () => {
   return (
     <div className="card-container">
       <Card
-        title="Users:"
+        title="Users overview"
         loading={!users}
         className="dashboard-container"
       >

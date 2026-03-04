@@ -41,7 +41,7 @@ const Login: React.FC = () => {
       }
 
       // Navigate to the user overview
-      router.push("/users");
+      router.push(`/users/${response.id}`);
     } catch (error) {
       if (error instanceof Error) {
         alert(`Something went wrong during the registration:\n${error.message}`);

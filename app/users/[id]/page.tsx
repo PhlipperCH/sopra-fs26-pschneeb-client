@@ -15,7 +15,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import { User } from "@/types/user";
-import { Button, Card, Table, Flex, Modal, Form, Input, message } from "antd";
+import { Button, Card, Table, Flex, Modal, Form, Input} from "antd";
 import type { TableProps } from "antd"; // antd component library allows imports of types
 
 
@@ -53,8 +53,8 @@ const columns: TableProps<User>["columns"] = [
   },
   {
     title: "Creation date",
-    dataIndex: "createdAt",
-    key: "createdAt",
+    dataIndex: "creation_date",
+    key: "creation_date",
     render: (value: string | null) => {
     if (!value) return "";
     const d = new Date(value);
@@ -115,7 +115,7 @@ const Profile: React.FC = () => {
   const passwordChange = async (values: PasswordChangeValues) => {
     try {
       // Call the API service and let it handle JSON serialization and error handling
-      await apiService.put<User>(`/users/${params.id}/password`, values);
+      await apiService.put<User>(`/users/${params.id}`, values);
       handleLogout();
 
     } catch (error) {
@@ -133,12 +133,11 @@ const Profile: React.FC = () => {
       try {
         // apiService.get<User[]> returns the parsed JSON object directly,
         // thus we can simply assign it to our users variable.
-        const users: User[] = await apiService.get<User[]>("/users");
-        const selection = users.find((user) => String(user.id) === viewedId) ?? null;
-        setUser(selection);
-        console.log("Fetched user:", user);
+        const fetchedUser =  await apiService.get<User>(`/users/${params.id}`);
+        setUser(fetchedUser);
+        console.log("Fetched user:", fetchedUser);
 
-        const me = users.find((u) => u.me);
+        const me = await apiService.get<User>(`/users/me`);
         setMeId(me?.id ? String(me.id) : null);
       } catch (error) {
         const err = error as ApplicationError;
